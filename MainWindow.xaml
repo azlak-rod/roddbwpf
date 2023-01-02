@@ -1,0 +1,85 @@
+﻿<Window x:Class="roddb.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        xmlns:local="clr-namespace:roddb"
+        mc:Ignorable="d"
+        x:Name="win1"
+        Title="MainWindow" Height="850" Width="1100">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="0.4*" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,5">
+            <Button Content="Set Filter" Margin="50,0,10,0" />
+            <Button Content="Clear Filter" />
+            <TextBlock Margin="50,0,0,0" Text="Search: "/>
+            <TextBox Margin="5,0,0,0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Width="100" />
+        </StackPanel>
+        <TabControl Grid.Row="1" x:Name="tabControl">
+            <TabItem Header="Browse Items">
+                <ListView ItemsSource="{Binding AllItemsCVS}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectedItem="{Binding SelectedItem}">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel  ItemWidth="200" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" TextWrapping="Wrap" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="15,0" Text="{Binding Name}" Foreground="DarkGreen" FontWeight="Bold" FontSize="24" />
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Browser" x:Name="tabBrowser">
+                <wv2:WebView2 x:Name="webView2">
+
+                </wv2:WebView2>
+            </TabItem>
+        </TabControl>
+        
+
+        <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1">
+            <TextBlock FontSize="20" FontWeight="Bold" TextAlignment="Center" Text="{Binding SelectedItem.Name}" TextWrapping="Wrap" />
+            <ListView ItemsSource="{Binding SelectedItem.StatValues}" 
+                      HorizontalContentAlignment="Stretch" BorderBrush="Transparent" HorizontalAlignment="Stretch"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.4*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Key}" FontWeight="Bold" Grid.Column="0" TextAlignment="Center" />
+                            <TextBlock Text="{Binding Value}" Grid.Column="1" TextAlignment="Center" TextWrapping="Wrap" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TextBlock>
+                Search on <Hyperlink Command="{Binding rodpSearchCommand}" CommandParameter="{Binding SelectedItem}">RoDPedia</Hyperlink>
+            </TextBlock>
+        </StackPanel>
+
+        
+        
+        
+    </Grid>
+</Window>
