@@ -23,7 +23,7 @@ jobs:
       with:
         dotnet-version: '7.0.x'
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet restore roddb.csproj
     - name: Build
       run: dotnet publish --configuration Release -o build roddb.csproj
     - name: Publish Artifacts
