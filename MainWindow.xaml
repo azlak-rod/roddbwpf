@@ -73,9 +73,25 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock>
-                Search on <Hyperlink Command="{Binding rodpSearchCommand}" CommandParameter="{Binding SelectedItem}">RoDPedia</Hyperlink>
-            </TextBlock>
+            <Button Command="{Binding rodpSearchCommand}" CommandParameter="{Binding SelectedItem}" HorizontalAlignment="Center" Margin="0,5,0,0" Padding="15,5">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedItem}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Button.Content>
+                    <TextBlock TextWrapping="Wrap">
+                    Search for
+                    '<Run FontWeight="Bold" Text="{Binding SelectedItem.Name}"></Run>'
+                        on RoDPedia
+                    </TextBlock>
+                </Button.Content>
+            </Button>
         </StackPanel>
 
         

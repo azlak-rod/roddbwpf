@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Threading;
@@ -58,6 +59,39 @@ namespace roddb
             timer.Stop();
             timer.Start();
         }
+        
+        public record SearchTerm(Predicate<RoDItem> Predicate);
+
+        private SearchTerm[] ParseTerms(string searchText)
+        {
+            // split into words
+            var words = searchText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            
+            var ret = new List<SearchTerm>();
+            foreach (var word in words)
+            {
+                if (word.Contains('>')) // || word.Contains('<') || word.Contains(':')
+                {
+                    var match = Regex.Match(word, @"^(?<stat>[\w\W]*?)>(?<amt>\d*)$");
+                    if (match.Success is false)
+                    {
+                        // Should probably warn about a dropped token
+                        continue;
+                    }
+                    
+                    var stat = match.Groups["stat"].Value;
+                    var amt = int.Parse(match.Groups["amt"].Value);
+                    
+
+                    ret.Add(new SearchTerm(item => item.GetStats().ContainsKey(stat) && item.GetStats()[stat] > amt));
+                }
+                else
+                {
+                    ret.Add(new SearchTerm(item => item.Name.Contains(word, StringComparison.OrdinalIgnoreCase)));
+                }
+            }
+            return ret.ToArray();
+        }
 
         public ICollectionView AllItemsCVS
         {
@@ -73,17 +107,11 @@ namespace roddb
 
                 if (!string.IsNullOrWhiteSpace(_searchText))
                 {
+                    var terms = ParseTerms(_searchText);
                     cvs.Filter += (o, e) =>
                     {
                         var item = (RoDItem)e.Item;
-                        if (item.Name.IndexOf(_searchText, System.StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            e.Accepted = true;
-                        }
-                        else
-                        {
-                            e.Accepted = false;
-                        }
+                        e.Accepted = terms.All(z => z.Predicate(item));
                     };
                 }
 
@@ -113,6 +141,39 @@ namespace roddb
         int? Dex, int? Con, int? Int, int? Wis, int? Lck, int? Cha, int? Moves,
         int? Weight, int? Value, string Properties, string Other, int? Price)
     {
+
+        private Dictionary<string, int?> _cachedStats;
+        public Dictionary<string, int?> GetStats()
+        {
+            if (_cachedStats == null)
+            {
+                _cachedStats = new Dictionary<string, int?>(StringComparer.OrdinalIgnoreCase)
+                {
+                    [nameof(Level)] = Level,
+                    [nameof(Str)] = Str,
+                    [nameof(Dex)] = Dex,
+                    [nameof(Con)] = Con,
+                    [nameof(Int)] = Int,
+                    [nameof(Wis)] = Wis,
+                    [nameof(Lck)] = Lck,
+                    [nameof(Cha)] = Cha,
+                    [nameof(Moves)] = Moves,
+                    [nameof(Weight)] = Weight,
+                    [nameof(Value)] = Value,
+                    [nameof(Price)] = Price,
+                    [nameof(AC)] = AC,
+                    [nameof(NegAC)] = NegAC,
+                    [nameof(d1)] = d1,
+                    [nameof(d2)] = d2,
+                    [nameof(HR)] = HR,
+                    [nameof(DR)] = DR,
+                    [nameof(HP)] = HP,
+                    [nameof(MP)] = MP,
+                };
+            }
+            return _cachedStats;
+        }
+
 
         public IEnumerable<KeyValuePair<string, string>> StatValues
         {
@@ -213,7 +274,7 @@ namespace roddb
                     case 0:
                         if (cval == "*")
                         {
-                            cval = "All";
+                            cval = "wield";
                         }
                         ret.WearLoc = cval;
                         break;
