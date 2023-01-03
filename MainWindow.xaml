@@ -18,10 +18,8 @@
             <ColumnDefinition Width="0.4*" />
         </Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,5">
-            <Button Content="Set Filter" Margin="50,0,10,0" />
-            <Button Content="Clear Filter" />
-            <TextBlock Margin="50,0,0,0" Text="Search: "/>
-            <TextBox Margin="5,0,0,0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Width="100" />
+            <TextBlock Margin="15,0,0,0" Text="Search: "/>
+            <TextBox Margin="5,0,0,0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Width="600" FontFamily="Consolas" />
         </StackPanel>
         <TabControl Grid.Row="1" x:Name="tabControl">
             <TabItem Header="Browse Items">
@@ -53,9 +51,19 @@
                 </wv2:WebView2>
             </TabItem>
         </TabControl>
-        
+
 
         <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedItem}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
             <TextBlock FontSize="20" FontWeight="Bold" TextAlignment="Center" Text="{Binding SelectedItem.Name}" TextWrapping="Wrap" />
             <ListView ItemsSource="{Binding SelectedItem.StatValues}" 
                       HorizontalContentAlignment="Stretch" BorderBrush="Transparent" HorizontalAlignment="Stretch"
@@ -74,16 +82,6 @@
                 </ListView.ItemTemplate>
             </ListView>
             <Button Command="{Binding rodpSearchCommand}" CommandParameter="{Binding SelectedItem}" HorizontalAlignment="Center" Margin="0,5,0,0" Padding="15,5">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Visibility" Value="Visible" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding SelectedItem}" Value="{x:Null}">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
                 <Button.Content>
                     <TextBlock TextWrapping="Wrap">
                     Search for

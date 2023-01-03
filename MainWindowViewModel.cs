@@ -50,7 +50,7 @@ namespace roddb
         private string _actualSearch;
 
         [ObservableProperty]
-        private RoDItem _selectedItem;
+        private RoDItem? _selectedItem;
 
         private DispatcherTimer timer = new() { Interval = TimeSpan.FromMilliseconds(800) };
 
@@ -70,9 +70,9 @@ namespace roddb
             var ret = new List<SearchTerm>();
             foreach (var word in words)
             {
-                if (word.Contains('>')) // || word.Contains('<') || word.Contains(':')
+                if (word.Contains('>') || word.Contains('<')) // || word.Contains('<') || word.Contains(':')
                 {
-                    var match = Regex.Match(word, @"^(?<stat>[\w\W]*?)>(?<amt>\d*)$");
+                    var match = Regex.Match(word, @"^(?<stat>[\w\W]*?)(?<comp>[><])(?<amt>\d*)$");
                     if (match.Success is false)
                     {
                         // Should probably warn about a dropped token
@@ -80,10 +80,30 @@ namespace roddb
                     }
                     
                     var stat = match.Groups["stat"].Value;
+                    var greaterThan = match.Groups["comp"].Value == ">" ? true : false;
                     var amt = int.Parse(match.Groups["amt"].Value);
                     
 
-                    ret.Add(new SearchTerm(item => item.GetStats().ContainsKey(stat) && item.GetStats()[stat] > amt));
+                    ret.Add(new SearchTerm(item => item.GetStats().ContainsKey(stat) && item.GetStats()[stat] is int statAmt && greaterThan switch
+                    {
+                        true => statAmt > amt,
+                        false => statAmt < amt
+                    }));
+                }
+                else if (word.Contains(':'))
+                {
+                    // in this case we are looking for a partial string match similar to a regular search
+                    var match = Regex.Match(word, @"^(?<stat>[\w\W]*?):(?<key>[\w\W]*?)$");
+                    if (match.Success is false)
+                    {
+                        // Should probably warn about a dropped token
+                        continue;
+                    }
+
+                    var stat = match.Groups["stat"].Value;
+                    var key = match.Groups["key"].Value;
+
+                    ret.Add(new SearchTerm(item => item.GetStats().ContainsKey(stat) && item.GetStats()[stat].ToString().Contains(key)));
                 }
                 else
                 {
@@ -142,13 +162,14 @@ namespace roddb
         int? Weight, int? Value, string Properties, string Other, int? Price)
     {
 
-        private Dictionary<string, int?> _cachedStats;
-        public Dictionary<string, int?> GetStats()
+        private Dictionary<string, object> _cachedStats;
+        public Dictionary<string, object> GetStats()
         {
             if (_cachedStats == null)
             {
-                _cachedStats = new Dictionary<string, int?>(StringComparer.OrdinalIgnoreCase)
+                _cachedStats = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
                 {
+                    [nameof(WearLoc)] = WearLoc,
                     [nameof(Level)] = Level,
                     [nameof(Str)] = Str,
                     [nameof(Dex)] = Dex,
@@ -169,6 +190,9 @@ namespace roddb
                     [nameof(DR)] = DR,
                     [nameof(HP)] = HP,
                     [nameof(MP)] = MP,
+                    [nameof(Name)] = Name,
+                    [nameof(Properties)] = Properties,
+                    [nameof(Other)] = Other,
                 };
             }
             return _cachedStats;
@@ -179,6 +203,10 @@ namespace roddb
         {
             get
             {
+                if (Level is not null)
+                {
+                    yield return new("Level", $"{Level}");
+                }
                 if (Weight is not null)
                 {
                     yield return new("Weight", $"{Weight}");
