@@ -6,8 +6,9 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:local="clr-namespace:roddb"
         mc:Ignorable="d"
+        Icon="pack://application:,,,/roddb;component/images/app.ico"
         x:Name="win1"
-        Title="MainWindow" Height="850" Width="1100">
+        Title="NewRoDDB" Height="850" Width="1100">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -81,7 +82,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Button Command="{Binding rodpSearchCommand}" CommandParameter="{Binding SelectedItem}" HorizontalAlignment="Center" Margin="0,5,0,0" Padding="15,5">
+            <Button Command="{Binding PerformRoDPediaSearchCommand}" CommandParameter="{Binding SelectedItem}" HorizontalAlignment="Center" Margin="0,5,0,0" Padding="15,5">
                 <Button.Content>
                     <TextBlock TextWrapping="Wrap">
                     Search for

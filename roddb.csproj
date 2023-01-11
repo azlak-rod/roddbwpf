@@ -9,8 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="images\app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1462.37" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="images\app.ico" />
   </ItemGroup>
 
   <ItemGroup>

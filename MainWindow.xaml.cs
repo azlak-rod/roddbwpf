@@ -21,14 +21,14 @@ namespace roddb
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly MainWindowViewModel _viewModel = new();
+        private readonly MainWindowViewModel _viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
+            _viewModel = new(webView2, Dispatcher);
             DataContext = _viewModel;
             _viewModel.MainWindow = this;
-            _viewModel.webView2 = webView2;
         }
     }
 }
