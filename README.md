@@ -1,3 +1,5 @@
+<img src="images/app.png" width="150" height="150" alt="App logo featuring a dragon, sword, mountains and some potions">
+
 # roddbwpf
 
 My take on the awesome Realms of Despair item db shared with me by Threndor, and is originally from the Druidic Cartographers. I've made no changes to the itemdb file and included it in this repo
