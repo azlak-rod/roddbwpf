@@ -9,11 +9,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="release\**" />
+    <Content Remove="release\**" />
+    <EmbeddedResource Remove="release\**" />
+    <None Remove="release\**" />
+    <Page Remove="release\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="images\app.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Razor" Version="3.1.32" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1462.37" />
   </ItemGroup>
 

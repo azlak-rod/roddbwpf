@@ -29,6 +29,19 @@ namespace roddb
             _viewModel = new(webView2, Dispatcher);
             DataContext = _viewModel;
             _viewModel.MainWindow = this;
+            this.Loaded += MainWindow_Loaded;
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await webView2.EnsureCoreWebView2Async();
+            webView2.CoreWebView2.HistoryChanged += CoreWebView2_HistoryChanged; ;
+        }
+
+        private void CoreWebView2_HistoryChanged(object? sender, object e)
+        {
+            _viewModel.CanGoForward = webView2.CanGoForward;
+            _viewModel.CanGoBack = webView2.CanGoBack;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Web.WebView2.Wpf;
-using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,6 +41,16 @@ namespace roddb
             };
             _webView2 = webView2;
             _uiDispatcher = uiDispatcher;
+
+            PropertyChanged += MainWindowViewModel_PropertyChanged;
+        }
+
+        private void MainWindowViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(CurrentUrl)))
+            {
+                _webView2.Source = new Uri(CurrentUrl);
+            }
         }
 
         [ObservableProperty]
@@ -63,7 +72,18 @@ namespace roddb
         private string _currentRoDPediaSearch = string.Empty;
 
         public MainWindow MainWindow { get; internal set; }
-        
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(BrowserBackCommand))]
+        private bool _canGoBack;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(BrowserForwardCommand))]
+        private bool _canGoForward;
+
+        [ObservableProperty]
+        private string _currentUrl;
+
         public ICollectionView AllItemsCVS
         {
             get
@@ -154,10 +174,34 @@ namespace roddb
         {
             var url = $"https://rodpedia.realmsofdespair.info/index.php?search={item.Name}";
             _currentRoDPediaSearch = item.Name;
-            _webView2.Source = new Uri(url);
+            CurrentUrl = url;
 
             MainWindow.tabControl.SelectedItem = MainWindow.tabBrowser;
             
+        }
+
+        [RelayCommand]
+        private void StartWebserver()
+        {
+            
+        }
+
+        [RelayCommand(CanExecute= "CanGoBack")]
+        private void BrowserBack()
+        {
+            if (_webView2.CanGoBack)
+            {
+                _webView2.GoBack();
+            }
+        }
+
+        [RelayCommand(CanExecute="CanGoForward")]
+        private void BrowserForward()
+        {
+            if (_webView2.CanGoForward)
+            {
+                _webView2.GoForward();
+            }
         }
     }
 }
